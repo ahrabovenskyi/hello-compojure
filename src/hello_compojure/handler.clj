@@ -5,24 +5,20 @@
             [clojure.data.json :as json]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
-;store language here
-(def language (ThreadLocal.))
+(def ^:dynamic dynamic-language "en")
 
 (defn map-keys
   [m f]
   (zipmap (map f (keys m)) (vals m)))
 
 (defn translate [s]
-  (if (= (.get language) "en")
+  ;(let [f (future (Thread/sleep 5000) (println "done") (println "language in future" dynamic-language) 100)] @f)
+  (if (= dynamic-language "en")
     s
-    (let [language (.get language)
-          translation-as-string (slurp (io/resource (str "public/" language "/translation.txt")))
+    (let [translation-as-string (slurp (io/resource (str "public/" dynamic-language "/translation.txt")))
           translation-map (map-keys (json/read-str translation-as-string) keyword)
           result ((keyword s) translation-map)]
-      result)
-    )
-  )
-
+      result)))
 
 (defn save-language-header
   [handler]
@@ -30,9 +26,7 @@
     (let [headers (:headers request)
           headers-as-map (map-keys headers keyword)
           language-header (:language headers-as-map "en")]
-      (.set language language-header)
-      (handler request)
-      ))
+      (binding [dynamic-language language-header] (handler request))))
   )
 
 (defroutes app-routes
@@ -42,5 +36,4 @@
 (def app
   (-> app-routes
       (wrap-routes save-language-header)
-      (wrap-defaults site-defaults)
-      ))
+      (wrap-defaults site-defaults)))
