@@ -5,6 +5,7 @@
             [clojure.data.json :as json]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
+;store language here
 (def language (ThreadLocal.))
 
 (defn map-keys
