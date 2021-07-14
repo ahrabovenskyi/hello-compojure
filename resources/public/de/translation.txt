@@ -1,4 +1,0 @@
-{
-    "Hello" : "Hallo",
-    "Bye" : "Tschüss"
-}
