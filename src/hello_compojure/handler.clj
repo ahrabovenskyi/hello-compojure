@@ -36,10 +36,6 @@
       ; every request has its own dynamic-language value which can not be overridden by another request.
       (binding [dynamic-language language-to-use] (handler request)))))
 
-(defn map-keys
-  [m f]
-  (zipmap (map f (keys m)) (vals m)))
-
 (defroutes app-routes
            ; and this how we perform the translation.
            ; we just pass the string to 'translate' function as argument
